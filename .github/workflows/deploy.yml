@@ -41,13 +41,21 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build
+        
+      - name: Verificar variables de compilacion
+        working-directory: frontend
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          node -e "console.log('URL configurada:', Boolean(process.env.VITE_SUPABASE_URL)); console.log('Clave configurada:', Boolean(process.env.VITE_SUPABASE_PUBLISHABLE_KEY))"
+
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
 
 
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v5
+
 
       - name: Subir archivos compilados
         uses: actions/upload-pages-artifact@v3
