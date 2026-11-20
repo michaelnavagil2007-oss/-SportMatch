@@ -1173,3 +1173,67 @@ footer p {
     font-size: 22px;
   }
 }
+
+/* ACCESO A SPORTMATCH AI */
+
+.sportmatch-ai-section {
+  width: 100%;
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 25px;
+  background: linear-gradient(
+    135deg,
+    #13243a,
+    #17365c
+  );
+  border: 1px solid #29415e;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.sportmatch-ai-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sportmatch-ai-icon {
+  font-size: 45px;
+}
+
+.sportmatch-ai-content h2 {
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.sportmatch-ai-content p {
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.sportmatch-ai-button {
+  display: inline-block;
+  padding: 12px 20px;
+  background: #2563eb;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.sportmatch-ai-button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 600px) {
+  .sportmatch-ai-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sportmatch-ai-section {
+    padding: 18px;
+  }
+}

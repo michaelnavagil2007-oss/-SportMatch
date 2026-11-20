@@ -731,6 +731,29 @@ function Dashboard() {
           </>
 
         )}
+
+<section className="sportmatch-ai-section">
+  <div className="sportmatch-ai-content">
+    <div className="sportmatch-ai-icon">
+      🤖
+    </div>
+
+    <div>
+      <h2>SportMatch AI</h2>
+
+      <p>
+        Tu asistente deportivo inteligente.
+        Consulta sobre perfiles, búsqueda de
+        talentos y funcionalidades de SportMatch.
+      </p>
+
+      <Link to="/ai" className="sportmatch-ai-button">
+        Hablar con SportMatch AI
+      </Link>
+    </div>
+  </div>
+</section>
+
 <ProfileVisibility />
 
       </main>
