@@ -1237,3 +1237,15 @@ footer p {
     padding: 18px;
   }
 }
+.navbar nav button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.navbar nav button:hover {
+  color: #38bdf8;
+}
