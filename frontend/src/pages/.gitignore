@@ -1,0 +1,25 @@
+
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Archivos privados y credenciales
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Archivos generados
+dist/
+**/dist/
+build/
+coverage/
+
+# Registros
+*.log
+npm-debug.log*
+
+# Sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
