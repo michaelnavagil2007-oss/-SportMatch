@@ -7,6 +7,7 @@ import Explore from './pages/Explore'
 import Services from './pages/Services'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
+import AI from './pages/AI'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/ai" element={<AI />} />
       </Routes>
     </BrowserRouter>
   )
