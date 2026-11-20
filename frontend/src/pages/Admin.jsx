@@ -47,8 +47,8 @@ export default function Admin() {
           await supabase
             .from('contact_messages')
             .select(
-              'id, name, email, subject, message, created_at'
-            )
+  'id, name, email, subject, message, status, created_at'
+)
             .order('created_at', { ascending: false })
 
         if (messagesError) throw messagesError
@@ -73,6 +73,37 @@ export default function Admin() {
       active = false
     }
   }, [navigate])
+
+
+async function updateMessageStatus(id, newStatus) {
+  setError('')
+
+  try {
+    const { data, error: updateError } = await supabase
+      .from('contact_messages')
+      .update({ status: newStatus })
+      .eq('id', id)
+      .select('id, status')
+      .single()
+
+    if (updateError) throw updateError
+
+    setMessages((previous) =>
+      previous.map((item) =>
+        item.id === data.id
+          ? { ...item, status: data.status }
+          : item
+      )
+    )
+  } catch (err) {
+    console.error('Error al actualizar mensaje:', err)
+
+    setError(
+      err.message ||
+      'No se pudo actualizar el mensaje.'
+    )
+  }
+}
 
   async function handleLogout() {
     const { error: logoutError } =
@@ -198,6 +229,58 @@ export default function Admin() {
               <p style={{ whiteSpace: 'pre-wrap' }}>
                 {item.message}
               </p>
+
+<div
+  style={{
+    marginTop: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap'
+  }}
+>
+  <span
+    style={{
+      padding: '8px 12px',
+      borderRadius: '8px',
+      background:
+        item.status === 'resolved'
+          ? '#14532d'
+          : '#78350f',
+      color: '#ffffff',
+      fontWeight: 'bold'
+    }}
+  >
+    {item.status === 'resolved'
+      ? 'Atendido'
+      : 'Pendiente'}
+  </span>
+
+  <button
+    type="button"
+    onClick={() =>
+      updateMessageStatus(
+        item.id,
+        item.status === 'resolved'
+          ? 'pending'
+          : 'resolved'
+      )
+    }
+    style={{
+      padding: '10px 16px',
+      borderRadius: '8px',
+      background: '#2563eb',
+      color: '#ffffff',
+      border: 'none',
+      cursor: 'pointer'
+    }}
+  >
+    {item.status === 'resolved'
+      ? 'Marcar como pendiente'
+      : 'Marcar como atendido'}
+  </button>
+</div>
+
             </article>
           ))}
         </section>
