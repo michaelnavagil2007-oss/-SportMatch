@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Explore() {
@@ -116,11 +116,17 @@ if (!authenticated) {
 
   return (
     <div className="dashboard-page">
-      <header className="dashboard-navbar">
-        <a href="/" className="dashboard-logo">
-          Sport<span>Match</span>
-        </a>
-      </header>
+      
+<header className="dashboard-navbar">
+  <Link to="/dashboard" className="dashboard-logo">
+    Sport<span>Match</span>
+  </Link>
+
+  <Link to="/dashboard" className="back-dashboard-btn">
+    ← Volver al Dashboard
+  </Link>
+</header>
+
 
       <main className="dashboard-content">
         <section className="dashboard-welcome">

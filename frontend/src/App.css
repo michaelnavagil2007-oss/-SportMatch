@@ -1249,3 +1249,29 @@ footer p {
 .navbar nav button:hover {
   color: #38bdf8;
 }
+
+/* Botón de regreso al Dashboard */
+.back-dashboard-btn {
+  display: inline-block;
+  padding: 12px 18px;
+  background: #1e293b;
+  color: #ffffff;
+  border: 1px solid #38bdf8;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.back-dashboard-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+@media (max-width: 480px) {
+  .back-dashboard-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
