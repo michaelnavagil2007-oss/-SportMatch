@@ -1,9 +1,12 @@
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Turnstile } from '@marsidev/react-turnstile'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Contact() {
+  const captchaRef = useRef(null)
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -11,9 +14,12 @@ export default function Contact() {
     message: ''
   })
 
+  const [captchaToken, setCaptchaToken] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
+
+  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -29,52 +35,51 @@ export default function Contact() {
 
     if (loading) return
 
-    setLoading(true)
     setError('')
     setSuccess('')
 
+    if (!captchaToken) {
+      setError('Completa la verificación de seguridad.')
+      return
+    }
+
+    setLoading(true)
+
     try {
-      const { data: { user }, error: authError } =
-        await supabase.auth.getUser()
-
-      if (authError || !user) {
-        throw new Error(
-          'Debes iniciar sesión para enviar un mensaje.'
-        )
-      }
-
-      const name = form.name.trim()
-      const email = form.email.trim()
-      const subject = form.subject.trim()
-      const message = form.message.trim()
-
-      if (
-        name.length < 2 ||
-        subject.length < 3 ||
-        message.length < 10
-      ) {
-        throw new Error(
-          'Revisa los campos y escribe un mensaje de al menos 10 caracteres.'
-        )
-      }
-
-      const { error: insertError } = await supabase
-        .from('contact_messages')
-        .insert({
-          user_id: user.id,
-          name,
-          email,
-          subject,
-          message
+      const { data, error: functionError } =
+        await supabase.functions.invoke('sportmatch-contact', {
+          body: {
+            name: form.name.trim(),
+            email: form.email.trim(),
+            subject: form.subject.trim(),
+            message: form.message.trim(),
+            captchaToken
+          }
         })
 
-      if (insertError) {
-        throw insertError
+      if (functionError) {
+        let message = 'No se pudo enviar el mensaje.'
+
+        if (functionError.context instanceof Response) {
+          const result = await functionError.context
+            .json()
+            .catch(() => null)
+
+          if (result?.error) {
+            message = result.error
+          }
+        }
+
+        throw new Error(message)
       }
 
-      setSuccess(
-        '¡Tu mensaje se envió correctamente!'
-      )
+      if (!data?.success) {
+        throw new Error(
+          data?.error || 'No se pudo confirmar el envío.'
+        )
+      }
+
+      setSuccess('¡Tu mensaje se envió correctamente!')
 
       setForm({
         name: '',
@@ -82,15 +87,17 @@ export default function Contact() {
         subject: '',
         message: ''
       })
-
     } catch (err) {
       console.error('Error al enviar contacto:', err)
+
       setError(
         err.message ||
         'No se pudo enviar el mensaje. Inténtalo nuevamente.'
       )
     } finally {
       setLoading(false)
+      setCaptchaToken('')
+      captchaRef.current?.reset()
     }
   }
 
@@ -117,22 +124,19 @@ export default function Contact() {
       <main className="dashboard-content">
         <section className="dashboard-welcome">
           <div>
-            <p className="section-label">
-              CONTÁCTANOS
-            </p>
-
+            <p className="section-label">CONTÁCTANOS</p>
             <h1>Contacto SportMatch</h1>
 
             <p>
               ¿Tienes preguntas, sugerencias o necesitas
-              ayuda? Envíanos un mensaje.
+              ayuda? Envíanos un mensaje sin crear una cuenta.
             </p>
           </div>
         </section>
 
         <section className="dashboard-section">
           <div
-  className="contact-card"
+            className="contact-card"
             style={{
               maxWidth: '650px',
               margin: '0 auto',
@@ -142,13 +146,14 @@ export default function Contact() {
             <h2>Envíanos tu mensaje</h2>
 
             <p style={{ marginBottom: '20px' }}>
-              Inicia sesión para utilizar el formulario.
+              Completa los campos y verifica que eres una persona.
             </p>
 
             <form onSubmit={handleSubmit}>
               <label htmlFor="contact-name">
                 Nombre completo
               </label>
+
               <input
                 id="contact-name"
                 type="text"
@@ -165,6 +170,7 @@ export default function Contact() {
               <label htmlFor="contact-email">
                 Correo electrónico
               </label>
+
               <input
                 id="contact-email"
                 type="email"
@@ -180,6 +186,7 @@ export default function Contact() {
               <label htmlFor="contact-subject">
                 Asunto
               </label>
+
               <input
                 id="contact-subject"
                 type="text"
@@ -196,6 +203,7 @@ export default function Contact() {
               <label htmlFor="contact-message">
                 Mensaje
               </label>
+
               <textarea
                 id="contact-message"
                 name="message"
@@ -211,6 +219,30 @@ export default function Contact() {
                 }}
                 placeholder="Escribe aquí tu mensaje..."
               />
+
+              <div style={{ marginBottom: '20px' }}>
+                {siteKey ? (
+                  <Turnstile
+                    ref={captchaRef}
+                    siteKey={siteKey}
+                    onSuccess={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken('')}
+                    onError={() => {
+                      setCaptchaToken('')
+                      setError(
+                        'No se pudo cargar la verificación de seguridad.'
+                      )
+                    }}
+                    options={{
+                      theme: 'auto'
+                    }}
+                  />
+                ) : (
+                  <p role="alert">
+                    Falta configurar la verificación de seguridad.
+                  </p>
+                )}
+              </div>
 
               {error && (
                 <p
@@ -233,10 +265,13 @@ export default function Contact() {
               <button
                 type="submit"
                 className="logout-btn"
-                disabled={loading}
+                disabled={loading || !captchaToken || !siteKey}
                 style={{
                   cursor: loading ? 'wait' : 'pointer',
-                  opacity: loading ? 0.6 : 1
+                  opacity:
+                    loading || !captchaToken || !siteKey
+                      ? 0.6
+                      : 1
                 }}
               >
                 {loading
