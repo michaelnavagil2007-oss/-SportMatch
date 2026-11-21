@@ -10,6 +10,7 @@ function Dashboard() {
   const [authenticated, setAuthenticated] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [loggingOut, setLoggingOut] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -26,6 +27,11 @@ function Dashboard() {
         }
 
         if (active) setAuthenticated(true)
+
+        // Los permisos se consultan en Supabase; no dependen del tipo de perfil.
+        const { data: adminAccess, error: adminError } =
+          await supabase.rpc('is_sportmatch_admin')
+        if (active) setIsAdmin(!adminError && adminAccess === true)
 
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -122,6 +128,16 @@ function Dashboard() {
   Explorar talentos
 </Link>
 
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="logout-btn"
+            style={{ textDecoration: 'none' }}
+          >
+            Panel de administración
+          </Link>
+        )}
+
         <div className="dashboard-user">
 
           <div className="user-avatar">
@@ -186,7 +202,13 @@ function Dashboard() {
               </p>
             </div>
 
-            <button>
+            <button
+              type="button"
+              onClick={() => document.getElementById('mi-perfil')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              })}
+            >
               Ver mi perfil
             </button>
 
@@ -242,7 +264,7 @@ function Dashboard() {
             </section>
 
 
-            <section className="dashboard-section">
+            <section id="mi-perfil" className="dashboard-section">
 
               <div className="dashboard-section-header">
 
@@ -343,8 +365,8 @@ function Dashboard() {
 
                   </div>
 
-                  <button className="opportunity-btn">
-                    Ver oportunidades
+                  <button className="opportunity-btn" type="button" disabled title="Función próximamente">
+                    Próximamente
                   </button>
 
                 </article>
@@ -377,9 +399,9 @@ function Dashboard() {
 
                   </div>
 
-                  <button className="opportunity-btn">
+                  <Link to="/explore" className="opportunity-btn" style={{ textDecoration: 'none' }}>
                     Explorar
-                  </button>
+                  </Link>
 
                 </article>
 
@@ -439,7 +461,7 @@ function Dashboard() {
             </section>
 
 
-            <section className="dashboard-section">
+            <section id="mi-perfil" className="dashboard-section">
 
               <div className="dashboard-section-header">
 
@@ -508,7 +530,7 @@ function Dashboard() {
 
               <div className="quick-actions">
 
-                <button className="quick-action">
+                <button className="quick-action" type="button" onClick={() => navigate('/explore')}>
                   <span>🔎</span>
 
                   <div>
@@ -524,7 +546,7 @@ function Dashboard() {
                 </button>
 
 
-                <button className="quick-action">
+                <button className="quick-action" type="button" disabled title="Función próximamente">
                   <span>➕</span>
 
                   <div>
@@ -539,7 +561,7 @@ function Dashboard() {
                 </button>
 
 
-                <button className="quick-action">
+                <button className="quick-action" type="button" disabled title="Función próximamente">
                   <span>📩</span>
 
                   <div>
@@ -609,7 +631,7 @@ function Dashboard() {
             </section>
 
 
-            <section className="dashboard-section">
+            <section id="mi-perfil" className="dashboard-section">
 
               <div className="dashboard-section-header">
 
@@ -678,7 +700,7 @@ function Dashboard() {
 
               <div className="quick-actions">
 
-                <button className="quick-action">
+                <button className="quick-action" type="button" onClick={() => navigate('/explore')}>
                   <span>🔎</span>
 
                   <div>
@@ -694,7 +716,7 @@ function Dashboard() {
                 </button>
 
 
-                <button className="quick-action">
+                <button className="quick-action" type="button" disabled title="Función próximamente">
                   <span>📢</span>
 
                   <div>
@@ -710,7 +732,7 @@ function Dashboard() {
                 </button>
 
 
-                <button className="quick-action">
+                <button className="quick-action" type="button" disabled title="Función próximamente">
                   <span>📩</span>
 
                   <div>
